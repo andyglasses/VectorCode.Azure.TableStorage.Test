@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>VectorCode.Azure.TableStorage.Testing</PackageId>
+    <Description>Core Azure Table Storage Testing library</Description>
+    <Authors>Andy @ VectorCode</Authors>
+    <Company>VectorCode</Company>
+    <Copyright></Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/andyglasses/VectorCode.Azure.TableStorage.Testing</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>azure;table;storage;table storage;library;test;testing;vectorcode</PackageTags>
+    <Title>Azure Table Storage Common Testing</Title>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- Optional: Detect breaking changes from a previous version -->
+    <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageProjectUrl>https://github.com/andyglasses/VectorCode.Azure.TableStorage.Testing</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="" />
+    <None Include="icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNet.ReproducibleBuilds">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MinVer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="VectorCode.Azure.TableStorage" />
+  </ItemGroup>
+
+</Project>

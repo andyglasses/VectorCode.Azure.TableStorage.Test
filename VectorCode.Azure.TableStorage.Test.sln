@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{A52BA758-3589-4C90-BCE2-583EFD0ADEED}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		global.json = global.json
+		LICENSE = LICENSE
+		nuget.config = nuget.config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{E1409EE1-8419-4B94-9CA2-C2A81938ED43}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{C7F3584D-2142-46D5-A2C4-4F2714AD7255}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish.yml = .github\workflows\publish.yml
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VectorCode.Azure.TableStorage.Testing", "src\VectorCode.Azure.TableStorage.Testing.csproj", "{2FE6F0DF-99BB-4BC1-9F26-A0C87B2C47B4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DA301AB4-556B-45EF-A28D-A0978F2BF737}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VectorCode.Azure.TableStorage.Testing.Test", "test\VectorCode.Azure.TableStorage.Testing.Test.csproj", "{4BA1DD11-1B4F-43AB-9160-2CD454962F8A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2FE6F0DF-99BB-4BC1-9F26-A0C87B2C47B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FE6F0DF-99BB-4BC1-9F26-A0C87B2C47B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FE6F0DF-99BB-4BC1-9F26-A0C87B2C47B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FE6F0DF-99BB-4BC1-9F26-A0C87B2C47B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BA1DD11-1B4F-43AB-9160-2CD454962F8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BA1DD11-1B4F-43AB-9160-2CD454962F8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BA1DD11-1B4F-43AB-9160-2CD454962F8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BA1DD11-1B4F-43AB-9160-2CD454962F8A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C7F3584D-2142-46D5-A2C4-4F2714AD7255} = {E1409EE1-8419-4B94-9CA2-C2A81938ED43}
+		{4BA1DD11-1B4F-43AB-9160-2CD454962F8A} = {DA301AB4-556B-45EF-A28D-A0978F2BF737}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4724198-B2C5-442A-AA56-8F2C83A964D2}
+	EndGlobalSection
+EndGlobal
