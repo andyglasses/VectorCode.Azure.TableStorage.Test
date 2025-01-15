@@ -1,7 +1,6 @@
 ﻿using Azure;
 using Azure.Data.Tables;
 using Azure.Data.Tables.Models;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace VectorCode.Azure.TableStorage.Testing;
@@ -260,6 +259,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
       throw new ArgumentException("Entity is not of the correct type");
     }
     tEntity.ETag = new ETag(Guid.NewGuid().ToString());
+    tEntity.Timestamp = DateTimeOffset.UtcNow;
     if (!Table.TryGetValue(entity.PartitionKey, out var subTable))
     {
       Table[entity.PartitionKey] = new Dictionary<string, T>();
@@ -291,6 +291,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
       throw new RequestFailedException(412, "Precondition Failed");
     }
     tEntity.ETag = new ETag(Guid.NewGuid().ToString());
+    tEntity.Timestamp = DateTimeOffset.UtcNow;
     subTable[entity.RowKey] = tEntity;    
   }
 
@@ -301,6 +302,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
       throw new ArgumentException("Entity is not of the correct type");
     }
     tEntity.ETag = new ETag(Guid.NewGuid().ToString());
+    tEntity.Timestamp = DateTimeOffset.UtcNow;
     if (!Table.TryGetValue(entity.PartitionKey, out var subTable))
     {
       Table[entity.PartitionKey] = new Dictionary<string, T>();

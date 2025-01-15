@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using VectorCode.Azure.TableStorage.Testing.Test.Fakes;
+﻿using VectorCode.Azure.TableStorage.Testing.Test.Fakes;
 
 namespace VectorCode.Azure.TableStorage.Testing.Test;
 
@@ -19,9 +18,9 @@ public class FakeTableClientCreatorTests
 
     // Assert
     var items = tableClient.Query<FakeTableEntity>().ToList();
-    items.Should().NotBeNull();
-    items.Should().HaveCount(1);
-    items[0].PartitionKey.Should().Be("pk");
-    items[0].RowKey.Should().Be("rk");
+    Assert.That(items, Is.Not.Null);
+    Assert.That(items, Has.Exactly(1).Items);
+    Assert.That(items[0].PartitionKey, Is.EqualTo("pk"));
+    Assert.That(items[0].RowKey, Is.EqualTo("rk"));
   }
 }
