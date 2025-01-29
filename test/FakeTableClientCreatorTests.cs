@@ -10,7 +10,7 @@ public class FakeTableClientCreatorTests
   {
     // Arrange
     var creator = new FakeTableClientCreator();
-    var entities = new List<FakeTableEntity> { new FakeTableEntity { PartitionKey = "pk", RowKey = "rk" } };
+    var entities = new List<FakeTableEntity> { new() { PartitionKey = "pk", RowKey = "rk" } };
     creator.SetTableData("test", entities);
 
     // Act
@@ -20,7 +20,10 @@ public class FakeTableClientCreatorTests
     var items = tableClient.Query<FakeTableEntity>().ToList();
     Assert.That(items, Is.Not.Null);
     Assert.That(items, Has.Exactly(1).Items);
-    Assert.That(items[0].PartitionKey, Is.EqualTo("pk"));
-    Assert.That(items[0].RowKey, Is.EqualTo("rk"));
+    using (Assert.EnterMultipleScope())
+    {
+      Assert.That(items[0].PartitionKey, Is.EqualTo("pk"));
+      Assert.That(items[0].RowKey, Is.EqualTo("rk"));
+    }
   }
 }
