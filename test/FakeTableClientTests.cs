@@ -11,7 +11,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_Constructor_ShouldInitializeData()
     {
       // Arrange & Act
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable", [
+      var fakeTableClient = new FakeTableClient("FakeTable", [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123"), Timestamp = DateTimeOffset.UtcNow }
       ]);
 
@@ -33,7 +33,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_CreateIfNotExistsAsync_ShouldReturnTableItemResponse()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable", [
+      var fakeTableClient = new FakeTableClient("FakeTable", [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
 
@@ -48,7 +48,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_GetEntityAsync_ShouldReturnExistingEntity()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable", [
+      var fakeTableClient = new FakeTableClient("FakeTable", [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
 
@@ -67,7 +67,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_GetEntityAsync_ShouldThrowForNonExistingEntity()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable", [
+      var fakeTableClient = new FakeTableClient("FakeTable", [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
 
@@ -82,7 +82,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_GetEntityIfExistsAsync_ShouldReturnExistingEntity()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable", [
+      var fakeTableClient = new FakeTableClient("FakeTable", [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
 
@@ -103,7 +103,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_GetEntityIfExistsAsync_ShouldNotThrowForNonExistingEntity()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable", [
+      var fakeTableClient = new FakeTableClient("FakeTable", [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
 
@@ -120,7 +120,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_AddEntityAsync_ShouldAddEntity_AndSetETag()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -139,33 +139,16 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk2"));
         Assert.That(entities["rk2"].PartitionKey, Is.EqualTo("pk2"));
         Assert.That(entities["rk2"].RowKey, Is.EqualTo("rk2"));
-        Assert.That(entities["rk2"].Value, Is.EqualTo("Value2"));
+        Assert.That((entities["rk2"] as FakeTableEntity)!.Value, Is.EqualTo("Value2"));
         Assert.That(entities["rk2"].ETag, Is.Not.EqualTo(new ETag()));
       }
-    }
-
-    [Test]
-    public void FakeTableClient_AddEntityAsync_ShouldThrowForBadType()
-    {
-      // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
-      [
-        new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
-      ]);
-      var newEntity = new FakeOtherTableEntity { PartitionKey = "pk2", RowKey = "rk2", Value = 5 };
-
-      // Act
-      var act = () => fakeTableClient.AddEntityAsync(newEntity);
-
-      // Assert
-      Assert.ThrowsAsync<ArgumentException>(async () => await act());
     }
 
     [Test]
     public void FakeTableClient_AddEntityAsync_ShouldThrowForDuplicateKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -182,7 +165,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_UpdateEntityAsync_ShouldUpdateEntity_AndChangeETagAndTimestamp_WhenETagAll()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123"), Timestamp = new DateTimeOffset(new DateTime(2020,05,06, 14,11,8)) }
       ]);
@@ -201,7 +184,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk1"));
         Assert.That(entities["rk1"].PartitionKey, Is.EqualTo("pk1"));
         Assert.That(entities["rk1"].RowKey, Is.EqualTo("rk1"));
-        Assert.That(entities["rk1"].Value, Is.EqualTo("updated"));
+        Assert.That((entities["rk1"] as FakeTableEntity)!.Value, Is.EqualTo("updated"));
         Assert.That(entities["rk1"].ETag, Is.Not.EqualTo(new ETag("123")));
         Assert.That(entities["rk1"].Timestamp, Is.GreaterThan(new DateTimeOffset(new DateTime(2020, 05, 06, 14, 11, 8))));
       }
@@ -211,7 +194,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_UpdateEntityAsync_ShouldUpdateEntity_AndChangeETagAndTimestamp_WhenMatchingETagParam()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123"), Timestamp = new DateTimeOffset(new DateTime(2020,05,06, 14,11,8)) }
       ]);
@@ -230,35 +213,17 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk1"));
         Assert.That(entities["rk1"].PartitionKey, Is.EqualTo("pk1"));
         Assert.That(entities["rk1"].RowKey, Is.EqualTo("rk1"));
-        Assert.That(entities["rk1"].Value, Is.EqualTo("updated"));
+        Assert.That((entities["rk1"] as FakeTableEntity)!.Value, Is.EqualTo("updated"));
         Assert.That(entities["rk1"].ETag, Is.Not.EqualTo(new ETag("123")));
         Assert.That(entities["rk1"].Timestamp, Is.GreaterThan(new DateTimeOffset(new DateTime(2020, 05, 06, 14, 11, 8))));
       }
     }
 
     [Test]
-    public void FakeTableClient_UpdateEntityAsync_ShouldThrowForBadType()
-    {
-      // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
-      [
-        new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
-      ]);
-      var updatedEntity = new FakeOtherTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = 2, ETag = new ETag("123") };
-
-      // Act
-      var act = () => fakeTableClient.UpdateEntityAsync(updatedEntity, ETag.All);
-
-      // Assert
-      Assert.ThrowsAsync<ArgumentException>(async () => await act());
-    }
-
-
-    [Test]
     public void FakeTableClient_UpdateEntityAsync_ShouldThrowForWrongETag()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -275,7 +240,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_UpdateEntityAsync_ShouldSkipForMissingPartition()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -295,7 +260,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk1"));
         Assert.That(entities["rk1"].PartitionKey, Is.EqualTo("pk1"));
         Assert.That(entities["rk1"].RowKey, Is.EqualTo("rk1"));
-        Assert.That(entities["rk1"].Value, Is.EqualTo("Value"));
+        Assert.That((entities["rk1"] as FakeTableEntity)!.Value, Is.EqualTo("Value"));
       }
     }
 
@@ -303,7 +268,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_UpdateEntityAsync_ShouldSkipForMissingRowKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -323,7 +288,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk1"));
         Assert.That(entities["rk1"].PartitionKey, Is.EqualTo("pk1"));
         Assert.That(entities["rk1"].RowKey, Is.EqualTo("rk1"));
-        Assert.That(entities["rk1"].Value, Is.EqualTo("Value"));
+        Assert.That((entities["rk1"] as FakeTableEntity)!.Value, Is.EqualTo("Value"));
       }
     }
 
@@ -331,7 +296,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_UpsertEntityAsync_ShouldUpdateExistingEntity()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123"), Timestamp = new DateTimeOffset(new DateTime(2020, 05, 12, 9, 14, 32)) }
       ]);
@@ -350,7 +315,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk1"));
         Assert.That(entities["rk1"].PartitionKey, Is.EqualTo("pk1"));
         Assert.That(entities["rk1"].RowKey, Is.EqualTo("rk1"));
-        Assert.That(entities["rk1"].Value, Is.EqualTo("updated"));
+        Assert.That((entities["rk1"] as FakeTableEntity)!.Value, Is.EqualTo("updated"));
         Assert.That(entities["rk1"].ETag, Is.Not.EqualTo(new ETag("123")));
         Assert.That(entities["rk1"].Timestamp, Is.GreaterThan(new DateTimeOffset(new DateTime(2020, 05, 12, 9, 14, 32))));
       }
@@ -360,7 +325,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_UpsertEntityAsync_ShouldAddNewEntity()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -379,7 +344,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk2"));
         Assert.That(entities["rk2"].PartitionKey, Is.EqualTo("pk1"));
         Assert.That(entities["rk2"].RowKey, Is.EqualTo("rk2"));
-        Assert.That(entities["rk2"].Value, Is.EqualTo("Value2"));
+        Assert.That((entities["rk2"] as FakeTableEntity)!.Value, Is.EqualTo("Value2"));
       }
     }
 
@@ -387,7 +352,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_UpsertEntityAsync_ShouldAddNewEntityWithNewPartition()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -407,32 +372,15 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
         Assert.That(entities.Keys, Has.Exactly(1).EqualTo("rk2"));
         Assert.That(entities["rk2"].PartitionKey, Is.EqualTo("pk2"));
         Assert.That(entities["rk2"].RowKey, Is.EqualTo("rk2"));
-        Assert.That(entities["rk2"].Value, Is.EqualTo("Value2"));
+        Assert.That((entities["rk2"] as FakeTableEntity)!.Value, Is.EqualTo("Value2"));
       }
-    }
-
-    [Test]
-    public void FakeTableClient_UpsertEntityAsync_ShouldThrowForBadType()
-    {
-      // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
-      [
-        new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
-      ]);
-      var newEntity = new FakeOtherTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = 2 };
-
-      // Act
-      var act = () => fakeTableClient.UpsertEntityAsync(newEntity);
-
-      // Assert
-      Assert.ThrowsAsync<ArgumentException>(async () => await act());
     }
 
     [Test]
     public async Task FakeTableClient_DeleteEntityAsyncByKeys_ShouldDeleteEntity()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -452,7 +400,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     {
       // Arrange
       var entity = new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("") };
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -471,7 +419,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_DeleteEntityAsyncByEntity_ShouldNotThrowErrorForNotFoundPartition()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -489,7 +437,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_DeleteEntityAsyncByEntity_ShouldNotThrowErrorForNotFoundRowKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -507,7 +455,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_DeleteEntityAsyncByEntity_ShouldThrowErrorDifferentETag()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value", ETag = new ETag("123") }
       ]);
@@ -525,7 +473,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_QueryAsync_ShouldFetchAllRecordsForPartitionKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -546,7 +494,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_QueryAsync_ShouldFetchOneRecordForPartitionKeyAndRowKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -567,7 +515,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_Query_ShouldFetchAllRecordsForPartitionKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -588,7 +536,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_Query_ShouldFetchOneRecordForPartitionKeyAndRowKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -609,7 +557,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public async Task FakeTableClient_SubmitTransactionAsync_ShouldDoAllChanges_WhenAllValid()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -640,8 +588,8 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
       using (Assert.EnterMultipleScope())
       {
         Assert.That(fakeTableClient.Table["pk1"].Keys, Has.Exactly(1).EqualTo("rk6"));
-        Assert.That(fakeTableClient.Table["pk1"]["rk4"].Value, Is.EqualTo("Value4-u"));
-        Assert.That(fakeTableClient.Table["pk1"]["rk3"].Value, Is.EqualTo("Value3-u"));
+        Assert.That((fakeTableClient.Table["pk1"]["rk4"] as FakeTableEntity)!.Value, Is.EqualTo("Value4-u"));
+        Assert.That((fakeTableClient.Table["pk1"]["rk3"] as FakeTableEntity)!.Value, Is.EqualTo("Value3-u"));
       }
       Assert.That(fakeTableClient.Table["pk1"].Keys, Has.None.EqualTo("rk1"));
     }
@@ -650,7 +598,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_SubmitTransactionAsync_ShouldThrowForDeleteOfMissingPartitionKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -673,7 +621,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_SubmitTransactionAsync_ShouldThrowForDeleteOfMissingRowKey()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -696,7 +644,7 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
     public void FakeTableClient_SubmitTransactionAsync_ShouldRollbackWhenErrorThrown()
     {
       // Arrange
-      var fakeTableClient = new FakeTableClient<FakeTableEntity>("FakeTable",
+      var fakeTableClient = new FakeTableClient("FakeTable",
       [
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
         new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = "Value2", ETag = new ETag("1232") },
@@ -718,8 +666,32 @@ namespace VectorCode.Azure.TableStorage.Testing.Test
       Assert.That(fakeTableClient.Table["pk1"], Has.Exactly(4).Items);
       using (Assert.EnterMultipleScope())
       {
-        Assert.That(fakeTableClient.Table["pk1"]["rk1"].Value, Is.EqualTo("Value1"));
+        Assert.That((fakeTableClient.Table["pk1"]["rk1"] as FakeTableEntity)!.Value, Is.EqualTo("Value1"));
         Assert.That(fakeTableClient.Table["pk1"]["rk1"].ETag, Is.EqualTo(new ETag("1231")));
+      }
+    }
+
+    [Test]
+    public async Task FakeTableClient_HandlesMultipleTypesInTable()
+    {
+      // Arrange
+      var fakeTableClient = new FakeTableClient("FakeTable",
+      [
+        new FakeTableEntity { PartitionKey = "pk1", RowKey = "rk1", Value = "Value1", ETag = new ETag("1231") },
+        new FakeOtherTableEntity { PartitionKey = "pk1", RowKey = "rk2", Value = 22, ETag = new ETag("1232") },
+      ]);
+
+      // Act
+      var result1 = await fakeTableClient.GetEntityIfExistsAsync<FakeTableEntity>("pk1", "rk1");
+      var result2 = await fakeTableClient.GetEntityIfExistsAsync<FakeOtherTableEntity>("pk1", "rk2");
+
+      // Assert      
+      using (Assert.EnterMultipleScope())
+      {
+        Assert.That(result1.HasValue, Is.True);
+        Assert.That(result1.Value!.Value, Is.EqualTo("Value1"));
+        Assert.That(result2.HasValue, Is.True);
+        Assert.That(result2.Value!.Value, Is.EqualTo(22));
       }
     }
 

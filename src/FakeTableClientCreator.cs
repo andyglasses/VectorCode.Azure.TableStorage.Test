@@ -1,5 +1,6 @@
 ﻿using Azure.Data.Tables;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace VectorCode.Azure.TableStorage.Testing;
 
@@ -8,17 +9,16 @@ namespace VectorCode.Azure.TableStorage.Testing;
 /// </summary>
 public class FakeTableClientCreator : ITableClientCreator
 {
-  private readonly Dictionary<string, (Type, object)> _initialTables = [];
+  private readonly Dictionary<string, List<ITableEntity>> _initialTables = [];
 
   /// <summary>
   /// Sets the initial data for a table
   /// </summary>
-  /// <typeparam name="T"></typeparam>
   /// <param name="tableName"></param>
   /// <param name="entities"></param>
-  public void SetTableData<T>(string tableName, List<T> entities) where T : BaseTableEntity
+  public void SetTableData<T>(string tableName, List<T> entities) where T : ITableEntity
   {
-    _initialTables[tableName] = (typeof(T), entities);
+    _initialTables[tableName] = new List<ITableEntity>(entities.Cast<ITableEntity>());
   }
 
   /// <inheritdoc />
@@ -29,16 +29,8 @@ public class FakeTableClientCreator : ITableClientCreator
     {
       throw new ArgumentException($"No initial data set for table {tableName}");
     }
-    Type tableType = setup.Item1;
-    Type listType = typeof(List<>).MakeGenericType(tableType);
-    var list = Activator.CreateInstance(listType);
-    var objectList = setup.Item2 as IEnumerable;
-    foreach (var item in objectList!)
-    {
-      listType.GetMethod("Add")?.Invoke(list, [item]);
-    }
-    var fakeTableClientType = typeof(FakeTableClient<>).MakeGenericType(tableType);
-    var fake = Activator.CreateInstance(fakeTableClientType, tableName, list) as TableClient;
+    var fakeTableClientType = typeof(FakeTableClient);
+    var fake = Activator.CreateInstance(fakeTableClientType, tableName, new List<ITableEntity>(setup)) as TableClient;
     return fake!;
   }
 }

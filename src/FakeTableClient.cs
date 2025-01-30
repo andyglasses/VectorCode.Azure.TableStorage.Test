@@ -12,13 +12,12 @@ namespace VectorCode.Azure.TableStorage.Testing;
 ///  - query with odata string will throw a not implemented exception
 ///  - query max per page will only generate one page
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableEntity
+public class FakeTableClient : TableClient
 {
   /// <summary>
   /// The table data
   /// </summary>
-  public Dictionary<string, Dictionary<string, T>> Table { get; private set; }
+  public Dictionary<string, Dictionary<string, ITableEntity>> Table { get; private set; }
   private readonly string _name;
 
   /// <summary>
@@ -26,10 +25,10 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
   /// </summary>
   /// <param name="name"></param>
   /// <param name="initialData"></param>
-  public FakeTableClient(string name, List<T> initialData) : base()
+  public FakeTableClient(string name, List<ITableEntity> initialData) : base()
   {
     _name = name;
-    var table = new Dictionary<string, Dictionary<string, T>>();
+    var table = new Dictionary<string, Dictionary<string, ITableEntity>>();
     foreach (var entity in initialData)
     {
       if (!table.TryGetValue(entity.PartitionKey, out _))
@@ -210,7 +209,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
   /// <inheritdoc />
   public override Pageable<TL> Query<TL>(Expression<Func<TL, bool>> filter, int? maxPerPage = null, IEnumerable<string>? select = null, CancellationToken cancellationToken = default)
   {
-    var query = (Table.Values.SelectMany(x => x.Values).AsQueryable() as IQueryable<TL>)!;
+    var query = new List<TL>(Table.Values.SelectMany(x => x.Values).Cast<TL>()).AsQueryable();
     query = query.Where(filter);
     if (maxPerPage.HasValue)
     {
@@ -222,7 +221,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
   /// <inheritdoc />
   public override AsyncPageable<TL> QueryAsync<TL>(Expression<Func<TL, bool>> filter, int? maxPerPage = null, IEnumerable<string>? select = null, CancellationToken cancellationToken = default)
   {
-    var query = (Table.Values.SelectMany(x => x.Values).AsQueryable() as IQueryable<TL>)!;
+    var query = new List<TL>(Table.Values.SelectMany(x => x.Values).Cast<TL>()).AsQueryable();
     query = query.Where(filter);
     if (maxPerPage.HasValue)
     {
@@ -239,7 +238,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
         throw new RequestFailedException(404, "Not Found");
       return;
     }
-    if (!subTable.TryGetValue(rowKey, out T? value))
+    if (!subTable.TryGetValue(rowKey, out ITableEntity? value))
     {
       if(throwIfNotFound)
         throw new RequestFailedException(404, "Not Found");
@@ -254,7 +253,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
 
   private void AddEntity(ITableEntity entity)
   {
-    if(entity is not T tEntity)
+    if(entity is not ITableEntity tEntity)
     {
       throw new ArgumentException("Entity is not of the correct type");
     }
@@ -262,7 +261,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
     tEntity.Timestamp = DateTimeOffset.UtcNow;
     if (!Table.TryGetValue(entity.PartitionKey, out var subTable))
     {
-      Table[entity.PartitionKey] = new Dictionary<string, T>();
+      Table[entity.PartitionKey] = new Dictionary<string, ITableEntity>();
       subTable = Table[entity.PartitionKey];
     }
     if (subTable.ContainsKey(entity.RowKey))
@@ -274,7 +273,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
 
   private void UpdateEntity(ITableEntity entity, ETag ifMatch)
   {
-    if (entity is not T tEntity)
+    if (entity is not ITableEntity tEntity)
     {
       throw new ArgumentException("Entity is not of the correct type");
     }
@@ -282,7 +281,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
     {
       return;
     }
-    if (!subTable.TryGetValue(entity.RowKey, out T? value))
+    if (!subTable.TryGetValue(entity.RowKey, out ITableEntity? value))
     {
       return;
     }
@@ -297,7 +296,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
 
   private void UpsertEntity(ITableEntity entity)
   {
-    if (entity is not T tEntity)
+    if (entity is not ITableEntity tEntity)
     {
       throw new ArgumentException("Entity is not of the correct type");
     }
@@ -305,7 +304,7 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
     tEntity.Timestamp = DateTimeOffset.UtcNow;
     if (!Table.TryGetValue(entity.PartitionKey, out var subTable))
     {
-      Table[entity.PartitionKey] = new Dictionary<string, T>();
+      Table[entity.PartitionKey] = new Dictionary<string, ITableEntity>();
       subTable = Table[entity.PartitionKey];
     }
     subTable[entity.RowKey] = tEntity;
@@ -315,15 +314,15 @@ public class FakeTableClient<T> : TableClient where T : BaseTableEntity, ITableE
   /// Shallow clones the table
   /// </summary>
   /// <returns></returns>
-  public Dictionary<string, Dictionary<string, T>> ShallowCloneTable()
+  public Dictionary<string, Dictionary<string, ITableEntity>> ShallowCloneTable()
   {
-    var clone = new Dictionary<string, Dictionary<string, T>>(); 
+    var clone = new Dictionary<string, Dictionary<string, ITableEntity>>(); 
     foreach (var outerPair in Table) 
     { 
-      var innerClone = new Dictionary<string, T>(); 
+      var innerClone = new Dictionary<string, ITableEntity>(); 
       foreach (var innerPair in outerPair.Value) 
       { 
-        innerClone.Add(innerPair.Key, (T)innerPair.Value); 
+        innerClone.Add(innerPair.Key, innerPair.Value); 
       }
       clone.Add(outerPair.Key, innerClone); 
     }
